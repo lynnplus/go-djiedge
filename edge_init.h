@@ -15,18 +15,11 @@
 #ifndef CEDGE_EDGE_INIT_H
 #define CEDGE_EDGE_INIT_H
 
+#include "edge_common.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-
-typedef struct {
-    const char *data;
-    size_t len;
-} CCString;
 
 typedef struct {
     uint8_t major_version;

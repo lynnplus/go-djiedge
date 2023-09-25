@@ -43,10 +43,6 @@ private:
     const string pPublicKey;
 };
 
-inline string to_cstring(CCString src) {
-    return {src.data, src.len};
-}
-
 int Edge_init(const CEdgeDevice *device, const CEdgeAppInfo *app, const CEdgeKeyStore *key, const CEdgeLogger *logger,
               bool deInitOnFailed) {
     if (device == nullptr || app == nullptr || key == nullptr) {

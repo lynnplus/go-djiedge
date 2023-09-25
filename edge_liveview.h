@@ -21,7 +21,6 @@
 
 typedef std::shared_ptr<edge_sdk::Liveview> EdgeLiveView;
 extern "C" {
-
 #else
 typedef void* EdgeLiveView;
 #endif
