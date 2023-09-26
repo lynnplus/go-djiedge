@@ -63,16 +63,17 @@ int Edge_init(const CEdgeInitOptions *opts, bool deInitOnFailed) {
     app_info.developer_account = copy_from_cstring(opts->app_info.developer_account);
     
     option.app_info = app_info;
-
-//    if (logger != nullptr && logger->level >= 0 && logger->output) {
-//        auto outputFunc = logger->output;
-//        auto ff = [outputFunc](const uint8_t *data, uint32_t dataLen) -> ErrorCode {
-//            outputFunc(data, dataLen);
-//            return kOk;
-//        };
-//        LoggerConsole console = {static_cast<LogLevel>(logger->level), ff, logger->is_support_color};
-//        option.logger_console_lists.push_back(console);
-//    }
+    
+    auto logger = opts->logger;
+    if (logger.level >= 0 && logger.output) {
+        auto outputFunc = logger.output;
+        auto ff = [outputFunc](const uint8_t *data, uint32_t dataLen) -> ErrorCode {
+            outputFunc(data, dataLen);
+            return kOk;
+        };
+        LoggerConsole console = {static_cast<LogLevel>(logger.level), ff, logger.is_support_color};
+        option.logger_console_lists.push_back(console);
+    }
     
     auto pubKey = copy_from_cstring(opts->key_store.public_key);
     auto prvKey = copy_from_cstring(opts->key_store.private_key);
