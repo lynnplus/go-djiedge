@@ -43,40 +43,39 @@ private:
     const string pPublicKey;
 };
 
-int Edge_init(const CEdgeDevice *device, const CEdgeAppInfo *app, const CEdgeKeyStore *key, const CEdgeLogger *logger,
-              bool deInitOnFailed) {
-    if (device == nullptr || app == nullptr || key == nullptr) {
+int Edge_init(const CEdgeInitOptions *opts, bool deInitOnFailed) {
+    if (opts == nullptr) {
         return kErrorInvalidArgument;
     }
     
     Options option;
-    option.product_name = to_cstring(device->product_name);
-    option.vendor_name = to_cstring(device->vendor_name);
-    option.serial_number = to_cstring(device->serial_number);
-    option.firmware_version = {device->firmware_version.major_version, device->firmware_version.minor_version,
-                               device->firmware_version.modify_version, device->firmware_version.debug_version};
+    option.product_name = copy_from_cstring(opts->product_name);
+    option.vendor_name = copy_from_cstring(opts->vendor_name);
+    option.serial_number = copy_from_cstring(opts->serial_number);
+    option.firmware_version = {opts->firmware_version.major_version, opts->firmware_version.minor_version,
+                               opts->firmware_version.modify_version, opts->firmware_version.debug_version};
     
     AppInfo app_info;
-    app_info.app_name = to_cstring(app->app_name);
-    app_info.app_id = to_cstring(app->app_id);
-    app_info.app_key = to_cstring(app->app_key);
-    app_info.app_license = to_cstring(app->app_license);
-    app_info.developer_account = to_cstring(app->developer_account);
+    app_info.app_name = copy_from_cstring(opts->app_info.app_name);
+    app_info.app_id = copy_from_cstring(opts->app_info.app_id);
+    app_info.app_key = copy_from_cstring(opts->app_info.app_key);
+    app_info.app_license = copy_from_cstring(opts->app_info.app_license);
+    app_info.developer_account = copy_from_cstring(opts->app_info.developer_account);
     
     option.app_info = app_info;
+
+//    if (logger != nullptr && logger->level >= 0 && logger->output) {
+//        auto outputFunc = logger->output;
+//        auto ff = [outputFunc](const uint8_t *data, uint32_t dataLen) -> ErrorCode {
+//            outputFunc(data, dataLen);
+//            return kOk;
+//        };
+//        LoggerConsole console = {static_cast<LogLevel>(logger->level), ff, logger->is_support_color};
+//        option.logger_console_lists.push_back(console);
+//    }
     
-    if (logger != nullptr && logger->level >= 0 && logger->output) {
-        auto outputFunc = logger->output;
-        auto ff = [outputFunc](const uint8_t *data, uint32_t dataLen) -> ErrorCode {
-            outputFunc(data, dataLen);
-            return kOk;
-        };
-        LoggerConsole console = {static_cast<LogLevel>(logger->level), ff, logger->is_support_color};
-        option.logger_console_lists.push_back(console);
-    }
-    
-    auto pubKey = to_cstring(key->public_key);
-    auto prvKey = to_cstring(key->private_key);
+    auto pubKey = copy_from_cstring(opts->key_store.public_key);
+    auto prvKey = copy_from_cstring(opts->key_store.private_key);
     option.key_store = std::make_shared<EdgeKeyStoreImpl>(prvKey, pubKey);
     
     auto ret = ESDKInit::Instance()->Init(option);

@@ -54,10 +54,12 @@ typedef struct {
     CCString vendor_name;
     CCString serial_number;
     CEdgeVersion firmware_version;
-} CEdgeDevice;
+    CEdgeAppInfo app_info;
+    CEdgeKeyStore key_store;
+    CEdgeLogger logger;
+} CEdgeInitOptions;
 
-int Edge_init(const CEdgeDevice *device, const CEdgeAppInfo *app, const CEdgeKeyStore *key,
-              const CEdgeLogger *logger, bool deInitOnFailed);
+int Edge_init(const CEdgeInitOptions *opts, bool deInitOnFailed);
 
 int Edge_deInit();
 

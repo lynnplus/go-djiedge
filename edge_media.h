@@ -69,7 +69,7 @@ int Edge_MFReader_init(CEdgeMFReader *reader);
 
 int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **files);
 
-int32_t Edge_MFReader_open(CEdgeMFReader *reader, CCString file_path);
+int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path);
 
 size_t Edge_MFReader_read(CEdgeMFReader *reader, int32_t fileHandle, void *buf, size_t count);
 

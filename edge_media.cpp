@@ -25,9 +25,30 @@ void Edge_MediaMgr_deleteMediaFilesReader(CEdgeMFReader *reader) {
     delete reader;
 }
 
+
+void convert_to_c_media_file(const MediaFile &src, CEdgeMediaFile &dst) {
+    dst.file_name = {src.file_name.size(), src.file_name.c_str()};
+    dst.file_path = {src.file_path.size(), src.file_path.c_str()};
+    dst.file_size = src.file_size;
+    dst.file_type = src.file_type;
+    dst.camera_attr = src.camera_attr;
+    dst.latitude = src.latitude;
+    dst.longitude = src.longitude;
+    dst.absolute_altitude = src.absolute_altitude;
+    dst.relative_altitude = src.relative_altitude;
+    dst.gimbal_yaw_degree = src.gimbal_yaw_degree;
+    dst.image_width = src.image_width;
+    dst.image_height = src.image_height;
+    dst.video_duration = src.video_duration;
+    dst.create_time = src.create_time;
+}
+
+
 int Edge_MediaMgr_registerMediaFilesObserver(CEdgeMediaFilesObserver callback) {
-    auto observer = [callback](const MediaFile &) -> ErrorCode {
-        callback(nullptr);
+    auto observer = [callback](const MediaFile &file) -> ErrorCode {
+        CEdgeMediaFile data;
+        convert_to_c_media_file(file, data);
+        callback(&data);
         return kOk;
     };
     return MediaManager::Instance()->RegisterMediaFilesObserver(observer);
@@ -51,17 +72,28 @@ int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **fil
     if (num <= 0) {
         return num;
     }
-    
-    auto out = (CEdgeMediaFile *) malloc(sizeof(CEdgeMediaFile) * num);
-    *files = out;
+    size_t n = 0;
     for (const auto &item: list) {
+        n += item->file_name.size() + item->file_path.size();
+    }
+    auto out = (CEdgeMediaFile *) malloc(sizeof(CEdgeMediaFile) * num + sizeof(char) * n);
+    *files = out;
+    char *buf = (char *) (out + sizeof(CEdgeMediaFile) * num);
+    for (const auto &item: list) {
+        convert_to_c_media_file(*(item), (*out));
+        
+        out->file_name = copy_from_string(item->file_name, buf);
+        buf += item->file_name.size();
+        out->file_path = copy_from_string(item->file_path, buf);
+        buf += item->file_path.size();
+        
         out++;
     }
     return num;
 }
 
-int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString file_path) {
-    return (*reader)->Open(to_cstring(file_path));
+int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path) {
+    return (*reader)->Open(copy_from_cstring(*file_path));
 }
 
 size_t Edge_MFReader_read(CEdgeMFReader *reader, int32_t fileHandle, void *buf, size_t count) {

@@ -23,21 +23,31 @@ extern "C" {
 #include <stdbool.h>
 
 typedef struct {
-    const char *data;
     size_t len;
+    const char *data;
 } CCString;
 
 #ifdef __cplusplus
 }
 #endif
 
+
 #ifdef __cplusplus
 
 #include <string>
-    #include<memory>
+#include <memory>
+#include <cstring>
 
-inline std::string to_cstring(CCString src) {
+inline std::string copy_from_cstring(const CCString &src) {
     return {src.data, src.len};
+}
+
+inline CCString copy_from_string(const std::string &src, char *buf) {
+    if (src.empty()) {
+        return {0, nullptr};
+    }
+    strncpy(buf, src.c_str(), src.size());
+    return {src.size(), buf};
 }
 
 
@@ -61,7 +71,6 @@ private:
     std::shared_ptr<T> ptr;
 };
 
-
-#endif
+#endif //__cplusplus
 
 #endif //CEDGE_EDGE_COMMON_H
