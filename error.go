@@ -41,6 +41,11 @@ var (
 	ErrConnectFailure    = errors.New("djiedge: a failure in establishing a connection")
 )
 
+var (
+	ErrSDKNotInit        = errors.New("sdk is not initialized")
+	ErrFileReaderNotOpen = errors.New("file reader is not opened")
+)
+
 func convertCCodeToError(code int) error {
 	if code == 0 {
 		return nil

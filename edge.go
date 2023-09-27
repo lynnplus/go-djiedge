@@ -25,24 +25,13 @@ void esdkCallGoLogger(uint8_t *data, uint32_t dataLen);
 */
 import "C"
 import (
+	"errors"
 	"fmt"
+	"sync/atomic"
 	"unsafe"
 )
 
-type LogLevel int
-
-func (l LogLevel) IsValid() bool {
-	return l >= LogLevelError && l <= LogLevelDebug
-}
-
-const (
-	LogLevelError LogLevel = iota
-	LogLevelWarn
-	LogLevelInfo
-	LogLevelDebug
-)
-
-func cstring(str string) C.CCString {
+func convertToCString(str string) C.CCString {
 	p := unsafe.Pointer(unsafe.StringData(str))
 	return C.CCString{
 		data: (*C.char)(p),
@@ -50,49 +39,90 @@ func cstring(str string) C.CCString {
 	}
 }
 
+var sdkLogHandler func(string)
+
 //export esdkCallGoLogger
 func esdkCallGoLogger(data *C.uint8_t, dataLen C.uint32_t) {
+	if sdkLogHandler == nil {
+		return
+	}
 	//int(dataLen)-2 remove the last newline character(\r\n)
 	tmp := unsafe.Slice(data, int(dataLen)-2)
 	str := string(tmp)
-	fmt.Println(str)
+	sdkLogHandler(str)
 }
 
-func getVersion() C.CEdgeVersion {
+func convertToCVersion(version *FirmwareVersion) C.CEdgeVersion {
 	return C.CEdgeVersion{
-		major_version:  C.uint8_t(0),
-		minor_version:  C.uint8_t(1),
-		modify_version: C.uint8_t(0),
-		debug_version:  C.uint8_t(0),
+		major_version:  C.uint8_t(version.MajorVersion),
+		minor_version:  C.uint8_t(version.MinorVersion),
+		modify_version: C.uint8_t(version.ModifyVersion),
+		debug_version:  C.uint8_t(version.DebugVersion),
 	}
 }
 
-func InitSDK() error {
-	device := &C.CEdgeDevice{
-		product_name:     cstring("product_name"),
-		vendor_name:      cstring("vendor_name"),
-		serial_number:    cstring("serial_number"),
-		firmware_version: getVersion(),
+var initState atomic.Int32 //0:none  1: initializing  2:initialized
+
+func Initialized() bool {
+	return initState.Load() == 2
+}
+
+// InitSDK initialize edge-sdk
+// deInitOnFailed: de-initialize the sdk after failure,because DJI will have some threads continuing to run after initialization failure.
+func InitSDK(device *DeviceInfo, auth *AuthInfo, key *RSA2048Key, logger *Logger, deInitOnFailed bool) (err error) {
+	if !initState.CompareAndSwap(0, 1) {
+		return errors.New("sdk is initializing or initialized")
+	}
+	defer func() {
+		if err != nil {
+			initState.Store(0)
+		} else {
+			initState.Store(2)
+		}
+	}()
+
+	if device == nil || auth == nil || key == nil {
+		return errors.New("parameter is nil")
+	}
+	// dji bug,an exception occurs when sn is empty
+	if device.SerialNumber == "" {
+		return errors.New("parameter is nil of device sn")
 	}
 
-	app := &C.CEdgeAppInfo{
-		app_name:          cstring("app_name"),
-		app_id:            cstring("app_id"),
-		app_key:           cstring("app_key"),
-		app_license:       cstring("app_license"),
-		developer_account: cstring("developer_account"),
+	appInfo := C.CEdgeAppInfo{
+		app_name:          convertToCString(auth.Name),
+		app_id:            convertToCString(auth.Id),
+		app_key:           convertToCString(auth.AppKey),
+		app_license:       convertToCString(auth.License),
+		developer_account: convertToCString(auth.Account),
 	}
-	key := &C.CEdgeKeyStore{
-		private_key: cstring("private_key"),
-		public_key:  cstring("public_key"),
-	}
-
-	logger := &C.CEdgeLogger{
-		level:            3,
-		is_support_color: true,
-		output:           C.CEdgeLogOutput(C.esdkCallGoLogger),
+	ks := C.CEdgeKeyStore{
+		private_key: convertToCString(key.PrivateKey),
+		public_key:  convertToCString(key.PublicKey),
 	}
 
-	ret := C.Edge_init(device, app, key, logger, true)
+	var logs C.CEdgeLogger
+	if logger != nil {
+		if !logger.Level.IsValid() {
+			return fmt.Errorf("%v is not a valid log level", logger.Level)
+		}
+		logs = C.CEdgeLogger{
+			level:            C.int(logger.Level),
+			is_support_color: C.bool(logger.EnableColorful),
+			output:           C.CEdgeLogOutput(C.esdkCallGoLogger),
+		}
+		sdkLogHandler = logger.Outputer
+	}
+
+	opts := &C.CEdgeInitOptions{
+		product_name:     convertToCString(device.ProductName),
+		vendor_name:      convertToCString(device.VendorName),
+		serial_number:    convertToCString(device.SerialNumber),
+		firmware_version: convertToCVersion(&device.FirmwareVersion),
+		app_info:         appInfo,
+		key_store:        ks,
+		logger:           logs,
+	}
+	ret := C.Edge_init(opts, C.bool(deInitOnFailed))
 	return convertCCodeToError(int(ret))
 }
