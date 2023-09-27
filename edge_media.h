@@ -67,6 +67,7 @@ int Edge_MediaMgr_setDroneNestAutoDelete(bool enable);
 
 int Edge_MFReader_init(CEdgeMFReader *reader);
 
+// need to manually use free to release the memory of the files on return num>0.
 int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **files);
 
 int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path);

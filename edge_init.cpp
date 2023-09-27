@@ -15,8 +15,6 @@
 #include "edge_init.h"
 
 #include <init.h>
-#include <iostream>
-
 
 using namespace edge_sdk;
 using namespace std;
@@ -47,7 +45,6 @@ int Edge_init(const CEdgeInitOptions *opts, bool deInitOnFailed) {
     if (opts == nullptr) {
         return kErrorInvalidArgument;
     }
-    
     Options option;
     option.product_name = copy_from_cstring(opts->product_name);
     option.vendor_name = copy_from_cstring(opts->vendor_name);
