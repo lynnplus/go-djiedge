@@ -39,9 +39,9 @@ func esdkCgoCloudCustomMsgCallback(buf *C.uint8_t, size C.uint32_t) {
 
 var cloudCustomMsgHandler func([]byte)
 
-// SendCustomMessageToCloud
+// SendCustomMessageToCloud send custom event message to cloud,
 // allows for sending data up to 256 bytes.
-// When using this interface, data is internally encapsulated following the Cloud API protocol format.
+// when using this interface, data is internally encapsulated following the Cloud API protocol format.
 func SendCustomMessageToCloud(data []byte) error {
 	if !Initialized() {
 		return ErrSDKNotInit

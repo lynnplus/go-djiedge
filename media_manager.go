@@ -102,6 +102,7 @@ type MediaFileReader struct {
 	status atomic.Int32 //0:closed  1:opening  2:opened 3:closing
 }
 
+// NewMediaFileReader return a media file reader
 func NewMediaFileReader() *MediaFileReader {
 	p := C.Edge_MediaMgr_createMediaFilesReader()
 	r := &MediaFileReader{native: p}
@@ -183,6 +184,7 @@ func (m *MediaFileReader) GetFileList() ([]*MediaFileDesc, error) {
 	return ret, nil
 }
 
+// OpenFile returns an opened *MediaFile
 func (m *MediaFileReader) OpenFile(path string) (*MediaFile, error) {
 	if !m.IsOpened() {
 		return nil, ErrFileReaderNotOpen

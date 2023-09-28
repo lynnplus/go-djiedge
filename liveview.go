@@ -64,12 +64,14 @@ func (c CameraSource) IsValid() bool {
 	return c >= CameraSourceWide && c <= CameraSourceIR
 }
 
+// The list of Stream source of payload camera
 const (
-	CameraSourceWide CameraSource = iota + 1
-	CameraSourceZoom
-	CameraSourceIR
+	CameraSourceWide CameraSource = iota + 1 //wide-angle lens camera
+	CameraSourceZoom                         //zoom lens camera
+	CameraSourceIR                           //infrared lens camera
 )
 
+// StreamQuality quality of the stream
 type StreamQuality int
 
 func (s StreamQuality) IsValid() bool {
@@ -90,6 +92,7 @@ const (
 	StreamQuality1080p
 )
 
+// CameraType type of Stream Camera
 type CameraType int
 
 func (c CameraType) IsValid() bool {
@@ -101,6 +104,7 @@ const (
 	CameraTypePayload
 )
 
+// StreamReceiver is an interface for receiving stream data, status and allocating stream data objects.
 type StreamReceiver[T io.Writer] interface {
 	OnStreamStatusUpdate(status *LiveStatus)
 	OnReceiveStreamData(data T)
@@ -128,8 +132,14 @@ type LiveView[T io.Writer] struct {
 	streamReceiver StreamReceiver[T]
 }
 
-// NewLiveView create a Live View object that receives stream state and data.
-// the generic T represents the stream data type that needs to be returned in the interface StreamReceiver
+// NewLiveView create a *LiveView object that receives stream state and data.
+// the generic T represents the stream data type that needs to be returned in the interface StreamReceiver.
+//
+// when *LiveView is no longer used, *LiveView.Destroy() should be called promptly to destroy it,
+// or wait for garbage collected
+// If *LiveView is garbage collected, a finalizer may close the file descriptor,
+// making it invalid; see runtime.SetFinalizer for more information on when
+// a finalizer might be run.
 func NewLiveView[T io.Writer]() *LiveView[T] {
 	lv := &LiveView[T]{}
 	p := C.Edge_LiveView_new()
@@ -146,7 +156,9 @@ func (lv *LiveView[T]) Destroy() {
 	runtime.SetFinalizer(lv, nil)
 }
 
-// Init stream subscription,
+// Init initialize live stream subscription.
+// Note: For a specific camera, you can initialize only once
+//
 // handler implement data processing for received streams.
 // allocator allocate data on received streams.
 func (lv *LiveView[T]) Init(cameraType CameraType, quality StreamQuality, handler StreamReceiver[T]) error {
@@ -173,6 +185,7 @@ func (lv *LiveView[T]) Init(cameraType CameraType, quality StreamQuality, handle
 	return nil
 }
 
+// DeInit de-initialize stream subscription
 func (lv *LiveView[T]) DeInit() {
 	C.Edge_LiveView_deInit(lv.native)
 }
@@ -198,6 +211,7 @@ func (lv *LiveView[T]) onReceiveStream(buf *C.uint8_t, size C.uint32_t) {
 	lv.streamReceiver.OnReceiveStreamData(d)
 }
 
+// SetCameraSource can switch the camera source used
 func (lv *LiveView[T]) SetCameraSource(source CameraSource) error {
 	if !source.IsValid() {
 		return errors.New("invalid parameter for camera source")
@@ -211,11 +225,13 @@ func (lv *LiveView[T]) setupStreamStatusCallback() error {
 	return convertCCodeToError(int(ret))
 }
 
+// StartH264Stream start receive live H264 stream,stream data can be received through StreamReceiver.OnStreamStatusUpdate
 func (lv *LiveView[T]) StartH264Stream() error {
 	ret := C.Edge_LiveView_startH264Stream(lv.native)
 	return convertCCodeToError(int(ret))
 }
 
+// StopH264Stream stop receive live H264 stream
 func (lv *LiveView[T]) StopH264Stream() error {
 	ret := C.Edge_LiveView_stopH264Stream(lv.native)
 	return convertCCodeToError(int(ret))

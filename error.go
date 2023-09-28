@@ -21,6 +21,7 @@ import (
 	"fmt"
 )
 
+// error wrap for DJI-Edge-SDK c++ ErrorCode
 var (
 	ErrInvalidArgument   = errors.New("djiedge: invalid argument")
 	ErrSystemError       = errors.New("djiedge: invalid use of UnreadRune")
