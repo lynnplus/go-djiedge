@@ -47,7 +47,7 @@ func esdkCallGoLogger(data *C.uint8_t, dataLen C.uint32_t) {
 		return
 	}
 	//int(dataLen)-2 remove the last newline character(\r\n)
-	tmp := unsafe.Slice(data, int(dataLen)-2)
+	tmp := unsafe.Slice((*byte)(data), int(dataLen)-2)
 	str := string(tmp)
 	sdkLogHandler(str)
 }

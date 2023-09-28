@@ -1,3 +1,5 @@
+//go:build linux && !custom_edge_env
+
 /*
  * Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
  *
@@ -16,7 +18,10 @@
 
 package djiedge
 
+// by default,just use the following cgo configuration,need to provide include dir and link search dir manually.
+// stdc++ minimum support c++11
+
 /*
-#cgo LDFLAGS: -ledgesdk -lcrypto
+#cgo LDFLAGS: -ledgesdk -lcrypto -lssh2
 */
 import "C"
