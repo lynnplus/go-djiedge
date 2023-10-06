@@ -27,17 +27,10 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"sync/atomic"
 	"unsafe"
 )
-
-func convertToCString(str string) C.CCString {
-	p := unsafe.Pointer(unsafe.StringData(str))
-	return C.CCString{
-		data: (*C.char)(p),
-		len:  C.size_t(len(str)),
-	}
-}
 
 var sdkLogHandler func(string)
 
@@ -114,7 +107,7 @@ func InitSDK(device *DeviceInfo, auth *AuthInfo, key *RSA2048Key, logger *Logger
 		sdkLogHandler = logger.Outputer
 	}
 
-	opts := &C.CEdgeInitOptions{
+	opts := C.CEdgeInitOptions{
 		product_name:     convertToCString(device.ProductName),
 		vendor_name:      convertToCString(device.VendorName),
 		serial_number:    convertToCString(device.SerialNumber),
@@ -123,6 +116,19 @@ func InitSDK(device *DeviceInfo, auth *AuthInfo, key *RSA2048Key, logger *Logger
 		key_store:        ks,
 		logger:           logs,
 	}
+
 	ret := C.Edge_init(opts, C.bool(deInitOnFailed))
+	runtime.KeepAlive(device)
+	runtime.KeepAlive(auth)
+	runtime.KeepAlive(key)
+	return convertCCodeToError(int(ret))
+}
+
+// DeInitSDK will de-initialize SDK environment
+func DeInitSDK() error {
+	if !initState.CompareAndSwap(1, 0) {
+		return errors.New("sdk is not initialized")
+	}
+	ret := C.Edge_deInit()
 	return convertCCodeToError(int(ret))
 }

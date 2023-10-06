@@ -43,8 +43,8 @@ func esdkCgoNewMediaFileCallback(f *C.CEdgeMediaFile) {
 
 func convertToMFDesc(f *C.CEdgeMediaFile) *MediaFileDesc {
 	return &MediaFileDesc{
-		FileName:         C.GoStringN(f.file_name.data, C.int(f.file_name.len)),
-		FilePath:         C.GoStringN(f.file_path.data, C.int(f.file_path.len)),
+		FileName:         convertToGoString(f.file_name),
+		FilePath:         convertToGoString(f.file_path), //C.GoStringN(f.file_path.data, C.int(f.file_path.len)),
 		FileSize:         uint64(f.file_size),
 		FileType:         MediaFileType(f.file_type),
 		CameraAttr:       CameraAttr(f.camera_attr),

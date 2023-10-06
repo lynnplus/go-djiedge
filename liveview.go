@@ -26,6 +26,7 @@ void esdkCgoStreamStatusCallback(void* ctx,uint32_t value);
 import "C"
 import (
 	"errors"
+	"fmt"
 	"io"
 	"runtime"
 	"unsafe"
@@ -244,4 +245,14 @@ type LiveStatus struct {
 	Quality720PAvailable  bool
 	Quality720PHAvailable bool
 	Quality1080PAvailable bool
+}
+
+func (l *LiveStatus) String() string {
+	return fmt.Sprintf("value:%d auto:%v 540p:%v 720p:%v 720ph:%v 1080p:%v",
+		l.Value,
+		l.QualityAutoAvailable,
+		l.Quality540PAvailable,
+		l.Quality720PAvailable,
+		l.Quality720PHAvailable,
+		l.Quality1080PAvailable)
 }
