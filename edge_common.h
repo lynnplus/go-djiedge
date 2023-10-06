@@ -15,6 +15,10 @@
 #ifndef CEDGE_EDGE_COMMON_H
 #define CEDGE_EDGE_COMMON_H
 
+
+#define PUBLIC_API __attribute__((unused))
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,6 +59,7 @@ inline CCString copy_from_string(const std::string &src, char *buf) {
 template<typename T>
 class CWrapPtr {
 public:
+    __attribute__((unused))
     explicit CWrapPtr(const std::shared_ptr<T> _ptr) : ptr(_ptr) {}
     
     CWrapPtr(const CWrapPtr &p) : ptr(p.ptr) {}

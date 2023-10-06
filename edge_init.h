@@ -59,9 +59,9 @@ typedef struct {
     CEdgeLogger logger;
 } CEdgeInitOptions;
 
-int Edge_init(const CEdgeInitOptions *opts, bool deInitOnFailed);
+PUBLIC_API int Edge_init(CEdgeInitOptions opts, bool deInitOnFailed);
 
-int Edge_deInit();
+PUBLIC_API int Edge_deInit();
 
 #ifdef __cplusplus
 }

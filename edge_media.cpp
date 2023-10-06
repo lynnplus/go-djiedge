@@ -16,12 +16,12 @@
 
 using namespace edge_sdk;
 
-CEdgeMFReader *Edge_MediaMgr_createMediaFilesReader() {
+PUBLIC_API CEdgeMFReader *Edge_MediaMgr_createMediaFilesReader() {
     auto p = MediaManager::Instance()->CreateMediaFilesReader();
     return new CEdgeMFReader(p);
 }
 
-void Edge_MediaMgr_deleteMediaFilesReader(CEdgeMFReader *reader) {
+PUBLIC_API void Edge_MediaMgr_deleteMediaFilesReader(CEdgeMFReader *reader) {
     delete reader;
 }
 
@@ -44,7 +44,7 @@ void convert_to_c_media_file(const MediaFile &src, CEdgeMediaFile &dst) {
 }
 
 
-int Edge_MediaMgr_registerMediaFilesObserver(CEdgeMediaFilesObserver callback) {
+PUBLIC_API int Edge_MediaMgr_registerMediaFilesObserver(CEdgeMediaFilesObserver callback) {
     auto observer = [callback](const MediaFile &file) -> ErrorCode {
         CEdgeMediaFile data;
         convert_to_c_media_file(file, data);
@@ -54,19 +54,19 @@ int Edge_MediaMgr_registerMediaFilesObserver(CEdgeMediaFilesObserver callback) {
     return MediaManager::Instance()->RegisterMediaFilesObserver(observer);
 }
 
-int Edge_MediaMgr_setDroneNestUploadCloud(bool enable) {
+PUBLIC_API int Edge_MediaMgr_setDroneNestUploadCloud(bool enable) {
     return MediaManager::Instance()->SetDroneNestUploadCloud(enable);
 }
 
-int Edge_MediaMgr_setDroneNestAutoDelete(bool enable) {
+PUBLIC_API int Edge_MediaMgr_setDroneNestAutoDelete(bool enable) {
     return MediaManager::Instance()->SetDroneNestAutoDelete(enable);
 }
 
-int Edge_MFReader_init(CEdgeMFReader *reader) {
+PUBLIC_API int Edge_MFReader_init(CEdgeMFReader *reader) {
     return (*reader)->Init();
 }
 
-int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **files) {
+PUBLIC_API int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **files) {
     MediaFilesReader::MediaFileList list;
     auto num = (*reader)->FileList(list);
     if (num <= 0) {
@@ -92,18 +92,18 @@ int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **fil
     return num;
 }
 
-int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path) {
+PUBLIC_API int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path) {
     return (*reader)->Open(copy_from_cstring(*file_path));
 }
 
-size_t Edge_MFReader_read(CEdgeMFReader *reader, int32_t fileHandle, void *buf, size_t count) {
+PUBLIC_API size_t Edge_MFReader_read(CEdgeMFReader *reader, int32_t fileHandle, void *buf, size_t count) {
     return (*reader)->Read(fileHandle, buf, count);
 }
 
-int Edge_MFReader_close(CEdgeMFReader *reader, int32_t fileHandle) {
+PUBLIC_API int Edge_MFReader_close(CEdgeMFReader *reader, int32_t fileHandle) {
     return (*reader)->Close(fileHandle);
 }
 
-int Edge_MFReader_deInit(CEdgeMFReader *reader) {
+PUBLIC_API int Edge_MFReader_deInit(CEdgeMFReader *reader) {
     return (*reader)->DeInit();
 }

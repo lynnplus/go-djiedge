@@ -15,9 +15,12 @@
 #ifndef CEDGE_EDGE_LIVEVIEW_H
 #define CEDGE_EDGE_LIVEVIEW_H
 
+#include "edge_common.h"
+
 #ifdef __cplusplus
 
 #include <liveview.h>
+
 
 typedef std::shared_ptr<edge_sdk::Liveview> EdgeLiveView;
 extern "C" {
@@ -42,15 +45,14 @@ typedef struct {
     CEdgeLiveViewStreamCallback stream_callback;
 } CEdgeLiveViewOptions;
 
-
-CEdgeLiveView *Edge_LiveView_new();
-void Edge_LiveView_delete(CEdgeLiveView *obj);
-int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions *opt);
-int Edge_LiveView_deInit(CEdgeLiveView *obj);
-int Edge_LiveView_setCameraSource(CEdgeLiveView *obj, int source);
-int Edge_LiveView_subscribeStreamStatus(CEdgeLiveView *obj, CEdgeLiveViewStreamStatusCallback callback);
-int Edge_LiveView_startH264Stream(CEdgeLiveView *obj);
-int Edge_LiveView_stopH264Stream(CEdgeLiveView *obj);
+PUBLIC_API CEdgeLiveView *Edge_LiveView_new();
+PUBLIC_API void Edge_LiveView_delete(CEdgeLiveView *obj);
+PUBLIC_API int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions *opt);
+PUBLIC_API int Edge_LiveView_deInit(CEdgeLiveView *obj);
+PUBLIC_API int Edge_LiveView_setCameraSource(CEdgeLiveView *obj, int source);
+PUBLIC_API int Edge_LiveView_subscribeStreamStatus(CEdgeLiveView *obj, CEdgeLiveViewStreamStatusCallback callback);
+PUBLIC_API int Edge_LiveView_startH264Stream(CEdgeLiveView *obj);
+PUBLIC_API int Edge_LiveView_stopH264Stream(CEdgeLiveView *obj);
 
 #ifdef __cplusplus
 }

@@ -18,10 +18,10 @@
 
 using namespace edge_sdk;
 
-int Edge_Cloud_registerCustomMsgHandler(CEdgeCloudCustomMsgHandler handler) {
+PUBLIC_API int Edge_Cloud_registerCustomMsgHandler(CEdgeCloudCustomMsgHandler handler) {
     return CloudAPI_RegisterCustomServicesMessageHandler(handler);
 }
 
-int Edge_Cloud_sendCustomEventsMessage(const uint8_t *data, uint32_t len) {
+PUBLIC_API int Edge_Cloud_sendCustomEventsMessage(const uint8_t *data, uint32_t len) {
     return CloudAPI_SendCustomEventsMessage(data, len);
 }

@@ -52,31 +52,31 @@ typedef struct {
 typedef void (*CEdgeMediaFilesObserver)(const CEdgeMediaFile *);
 
 
-CEdgeMFReader *Edge_MediaMgr_createMediaFilesReader();
+PUBLIC_API CEdgeMFReader *Edge_MediaMgr_createMediaFilesReader();
 
-void Edge_MediaMgr_deleteMediaFilesReader(CEdgeMFReader *reader);
+PUBLIC_API void Edge_MediaMgr_deleteMediaFilesReader(CEdgeMFReader *reader);
 
-int Edge_MediaMgr_registerMediaFilesObserver(CEdgeMediaFilesObserver callback);
+PUBLIC_API int Edge_MediaMgr_registerMediaFilesObserver(CEdgeMediaFilesObserver callback);
 
-int Edge_MediaMgr_setDroneNestUploadCloud(bool enable);
+PUBLIC_API int Edge_MediaMgr_setDroneNestUploadCloud(bool enable);
 
-int Edge_MediaMgr_setDroneNestAutoDelete(bool enable);
+PUBLIC_API int Edge_MediaMgr_setDroneNestAutoDelete(bool enable);
 
 
 //***********MediaFilesReader start***********//
 
-int Edge_MFReader_init(CEdgeMFReader *reader);
+PUBLIC_API int Edge_MFReader_init(CEdgeMFReader *reader);
 
 // need to manually use free to release the memory of the files on return num>0.
-int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **files);
+PUBLIC_API int32_t Edge_MFReader_fileList(CEdgeMFReader *reader, const CEdgeMediaFile **files);
 
-int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path);
+PUBLIC_API int32_t Edge_MFReader_open(CEdgeMFReader *reader, const CCString *file_path);
 
-size_t Edge_MFReader_read(CEdgeMFReader *reader, int32_t fileHandle, void *buf, size_t count);
+PUBLIC_API size_t Edge_MFReader_read(CEdgeMFReader *reader, int32_t fileHandle, void *buf, size_t count);
 
-int Edge_MFReader_close(CEdgeMFReader *reader, int32_t fileHandle);
+PUBLIC_API int Edge_MFReader_close(CEdgeMFReader *reader, int32_t fileHandle);
 
-int Edge_MFReader_deInit(CEdgeMFReader *reader);
+PUBLIC_API int Edge_MFReader_deInit(CEdgeMFReader *reader);
 
 //***********MediaFilesReader end***********//
 

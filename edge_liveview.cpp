@@ -18,12 +18,12 @@ using namespace edge_sdk;
 using namespace std;
 
 
-CEdgeLiveView *Edge_LiveView_new() {
+PUBLIC_API CEdgeLiveView *Edge_LiveView_new() {
     auto obj = CreateLiveview();
     return new CEdgeLiveView({obj, nullptr});
 }
 
-void Edge_LiveView_delete(CEdgeLiveView *obj) {
+PUBLIC_API void Edge_LiveView_delete(CEdgeLiveView *obj) {
     if (obj == nullptr) {
         return;
     }
@@ -32,7 +32,7 @@ void Edge_LiveView_delete(CEdgeLiveView *obj) {
     delete obj;
 }
 
-int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions *opt) {
+PUBLIC_API int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions *opt) {
     if (obj == nullptr || obj->instance == nullptr || opt == nullptr) {
         return kErrorInvalidArgument;
     }
@@ -49,21 +49,21 @@ int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions *opt) {
     return obj->instance->Init(options);
 }
 
-int Edge_LiveView_deInit(CEdgeLiveView *obj) {
+PUBLIC_API int Edge_LiveView_deInit(CEdgeLiveView *obj) {
     if (obj == nullptr || obj->instance == nullptr) {
         return kErrorInvalidArgument;
     }
     return obj->instance->DeInit();
 }
 
-int Edge_LiveView_setCameraSource(CEdgeLiveView *obj, int source) {
+PUBLIC_API int Edge_LiveView_setCameraSource(CEdgeLiveView *obj, int source) {
     if (obj == nullptr || obj->instance == nullptr) {
         return kErrorInvalidArgument;
     }
     return obj->instance->SetCameraSource(static_cast<Liveview::CameraSource>(source));
 }
 
-int Edge_LiveView_subscribeStreamStatus(CEdgeLiveView *obj, CEdgeLiveViewStreamStatusCallback callback) {
+PUBLIC_API int Edge_LiveView_subscribeStreamStatus(CEdgeLiveView *obj, CEdgeLiveViewStreamStatusCallback callback) {
     if (obj == nullptr || obj->instance == nullptr || callback == nullptr) {
         return kErrorInvalidArgument;
     }
@@ -73,14 +73,14 @@ int Edge_LiveView_subscribeStreamStatus(CEdgeLiveView *obj, CEdgeLiveViewStreamS
     return obj->instance->SubscribeLiveviewStatus(cb);
 }
 
-int Edge_LiveView_startH264Stream(CEdgeLiveView *obj) {
+PUBLIC_API int Edge_LiveView_startH264Stream(CEdgeLiveView *obj) {
     if (obj == nullptr || obj->instance == nullptr) {
         return kErrorInvalidArgument;
     }
     return obj->instance->StartH264Stream();
 }
 
-int Edge_LiveView_stopH264Stream(CEdgeLiveView *obj) {
+PUBLIC_API int Edge_LiveView_stopH264Stream(CEdgeLiveView *obj) {
     if (obj == nullptr || obj->instance == nullptr) {
         return kErrorInvalidArgument;
     }

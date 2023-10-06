@@ -15,6 +15,8 @@
 #ifndef CEDGE_EDGE_CLOUD_H
 #define CEDGE_EDGE_CLOUD_H
 
+#include "edge_common.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,9 +25,9 @@ extern "C" {
 
 typedef void (*CEdgeCloudCustomMsgHandler)(const uint8_t *data, uint32_t len);
 
-int Edge_Cloud_registerCustomMsgHandler(CEdgeCloudCustomMsgHandler handler);
+PUBLIC_API int Edge_Cloud_registerCustomMsgHandler(CEdgeCloudCustomMsgHandler handler);
 
-int Edge_Cloud_sendCustomEventsMessage(const uint8_t *data, uint32_t len);
+PUBLIC_API int Edge_Cloud_sendCustomEventsMessage(const uint8_t *data, uint32_t len);
 
 
 #ifdef __cplusplus
