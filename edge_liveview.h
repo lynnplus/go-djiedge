@@ -32,12 +32,12 @@ typedef void* EdgeLiveView;
 #include <stdint.h>
 
 typedef struct {
+    const void *ctx;
     EdgeLiveView instance;
-    void *ctx;
 } CEdgeLiveView;
 
-typedef void (*CEdgeLiveViewStreamCallback)(void *ctx, const uint8_t *buf, uint32_t len);
-typedef void (*CEdgeLiveViewStreamStatusCallback)(void *ctx, uint32_t status);
+typedef void (*CEdgeLiveViewStreamCallback)(const void *ctx, const uint8_t *buf, uint32_t len);
+typedef void (*CEdgeLiveViewStreamStatusCallback)(const void *ctx, uint32_t status);
 
 typedef struct {
     int camera;
@@ -45,7 +45,7 @@ typedef struct {
     CEdgeLiveViewStreamCallback stream_callback;
 } CEdgeLiveViewOptions;
 
-PUBLIC_API CEdgeLiveView *Edge_LiveView_new();
+PUBLIC_API CEdgeLiveView *Edge_LiveView_new(const void *ctx);
 PUBLIC_API void Edge_LiveView_delete(CEdgeLiveView *obj);
 PUBLIC_API int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions *opt);
 PUBLIC_API int Edge_LiveView_deInit(CEdgeLiveView *obj);

@@ -18,9 +18,9 @@ using namespace edge_sdk;
 using namespace std;
 
 
-PUBLIC_API CEdgeLiveView *Edge_LiveView_new() {
+PUBLIC_API CEdgeLiveView *Edge_LiveView_new(const void *ctx) {
     auto obj = CreateLiveview();
-    return new CEdgeLiveView({obj, nullptr});
+    return new CEdgeLiveView({.ctx=ctx, .instance=obj});
 }
 
 PUBLIC_API void Edge_LiveView_delete(CEdgeLiveView *obj) {
@@ -40,7 +40,9 @@ PUBLIC_API int Edge_LiveView_init(CEdgeLiveView *obj, const CEdgeLiveViewOptions
     if (opt->stream_callback != nullptr) {
         auto streamCB = opt->stream_callback;
         cb = [obj, streamCB](const uint8_t *buf, uint32_t len) -> ErrorCode {
-            streamCB(obj->ctx, buf, len);
+            if (obj->ctx != nullptr) {
+                streamCB(obj->ctx, buf, len);
+            }
             return kOk;
         };
     }
