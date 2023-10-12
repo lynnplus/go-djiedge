@@ -184,7 +184,8 @@ func (m *MediaFileReader) GetFileList() ([]*MediaFileDesc, error) {
 	return ret, nil
 }
 
-// OpenFile returns an opened *MediaFile
+// OpenFile returns an opened *MediaFile.
+// The parameter 'path' from MediaFileDesc.FilePath
 func (m *MediaFileReader) OpenFile(path string) (*MediaFile, error) {
 	if !m.IsOpened() {
 		return nil, ErrFileReaderNotOpen
@@ -197,7 +198,7 @@ func (m *MediaFileReader) OpenFile(path string) (*MediaFile, error) {
 	}
 
 	mf := &MediaFile{
-		handle: FileHandle(fh),
+		handle: fileHandle(fh),
 		reader: m,
 		path:   path,
 	}
@@ -205,7 +206,7 @@ func (m *MediaFileReader) OpenFile(path string) (*MediaFile, error) {
 	return mf, nil
 }
 
-func (m *MediaFileReader) readFile(fh FileHandle, buf []byte) (int, error) {
+func (m *MediaFileReader) readFile(fh fileHandle, buf []byte) (int, error) {
 	if !m.IsOpened() {
 		return 0, ErrFileReaderNotOpen
 	}
@@ -214,7 +215,7 @@ func (m *MediaFileReader) readFile(fh FileHandle, buf []byte) (int, error) {
 	return int(n), nil
 }
 
-func (m *MediaFileReader) closeFile(fh FileHandle) error {
+func (m *MediaFileReader) closeFile(fh fileHandle) error {
 	if !m.IsOpened() {
 		return ErrFileReaderNotOpen
 	}

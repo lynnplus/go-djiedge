@@ -62,11 +62,11 @@ type MediaFileDesc struct {
 	CreateTime       time.Time
 }
 
-type FileHandle int32
+type fileHandle int32
 
 type MediaFile struct {
 	path   string
-	handle FileHandle
+	handle fileHandle
 	reader *MediaFileReader
 }
 
