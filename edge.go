@@ -1,3 +1,5 @@
+//go:build linux
+
 /*
  * Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
  *

@@ -1,3 +1,5 @@
+//go:build linux
+
 /*
  * Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
  *
@@ -18,49 +20,7 @@ package djiedge
 
 import (
 	"runtime"
-	"time"
 )
-
-type MediaFileType int
-
-func (m MediaFileType) IsValid() bool {
-	return m == MediaFileTypeJPEG || m == MediaFileTypeMP4
-}
-
-const (
-	MediaFileTypeJPEG MediaFileType = 0
-	MediaFileTypeMP4  MediaFileType = 3
-)
-
-type CameraAttr int
-
-func (c CameraAttr) IsValid() bool {
-	return c == CameraAttrInfrared || c == CameraAttrWide || c == CameraAttrZoom || c == CameraAttrVisible
-}
-
-const (
-	CameraAttrInfrared CameraAttr = iota
-	CameraAttrZoom
-	CameraAttrWide
-	CameraAttrVisible CameraAttr = iota + 2
-)
-
-type MediaFileDesc struct {
-	FileName         string
-	FilePath         string
-	FileSize         uint64
-	FileType         MediaFileType
-	CameraAttr       CameraAttr
-	Latitude         float64
-	Longitude        float64
-	AbsoluteAltitude float64
-	RelativeAltitude float64
-	GimbalYawDegree  float64
-	ImageWidth       int
-	ImageHeight      int
-	VideoDuration    time.Duration
-	CreateTime       time.Time
-}
 
 type fileHandle int32
 

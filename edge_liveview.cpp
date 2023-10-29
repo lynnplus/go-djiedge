@@ -1,3 +1,5 @@
+//go:build linux
+
 // Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

@@ -18,8 +18,10 @@ package djiedge
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // FirmwareVersion firmware version number
@@ -108,4 +110,125 @@ type Logger struct {
 	Level          LogLevel
 	EnableColorful bool
 	Outputer       func(msg string)
+}
+
+// The CameraSource type of stream source
+type CameraSource int
+
+func (c CameraSource) IsValid() bool {
+	return c >= CameraSourceWide && c <= CameraSourceIR
+}
+
+const (
+	CameraSourceWide CameraSource = iota + 1 //wide-angle lens camera
+	CameraSourceZoom                         //zoom lens camera
+	CameraSourceIR                           //infrared lens camera
+)
+
+// StreamQuality quality of the stream
+type StreamQuality int
+
+func (s StreamQuality) IsValid() bool {
+	return s >= StreamQuality540p && s <= StreamQuality1080p
+}
+
+const (
+	// StreamQuality540p 30fps, 960*540, bps 512*1024
+	StreamQuality540p StreamQuality = iota + 1
+
+	// StreamQuality720p 30fps, 1280*720, bps 1024*1024
+	StreamQuality720p
+
+	// StreamQuality720pHigh 30fps, 1280*720, bps 1024*1024 + 512*1024
+	StreamQuality720pHigh
+
+	// StreamQuality1080p 30fps, 1920*1080, bps 3*1024*1024
+	StreamQuality1080p
+)
+
+// CameraType type of stream camera
+type CameraType int
+
+func (c CameraType) IsValid() bool {
+	return c == CameraTypeFpv || c == CameraTypePayload
+}
+
+const (
+	CameraTypeFpv CameraType = iota
+	CameraTypePayload
+)
+
+// StreamReceiver is an interface for receiving stream data, status.
+type StreamReceiver interface {
+	// The OnStreamStatusUpdate is callback for LiveView stream-status.
+	//
+	//When the cloud is configured for live broadcast, the transmission channel is unbalanced, the aircraft is disconnected,
+	//the video transmission has no signal and other factors will cause the code stream status to change.
+	OnStreamStatusUpdate(status *LiveStatus)
+	// The OnReceiveStreamData is a callback that receives stream data.
+	//
+	//Note: The 'data' parameter is a reference pointing to the C memory block.
+	//you should use 'copy(dst,data)' or bytes.Buffer.Write() to copy it to the Go memory block,
+	//directly using it as go bytes will cause panic.
+	OnReceiveStreamData(data []byte)
+}
+
+type LiveStatus struct {
+	Value                 int
+	QualityAutoAvailable  bool
+	Quality540PAvailable  bool
+	Quality720PAvailable  bool
+	Quality720PHAvailable bool
+	Quality1080PAvailable bool
+}
+
+func (l *LiveStatus) String() string {
+	return fmt.Sprintf("value:%d auto:%v 540p:%v 720p:%v 720ph:%v 1080p:%v",
+		l.Value,
+		l.QualityAutoAvailable,
+		l.Quality540PAvailable,
+		l.Quality720PAvailable,
+		l.Quality720PHAvailable,
+		l.Quality1080PAvailable)
+}
+
+type MediaFileType int
+
+func (m MediaFileType) IsValid() bool {
+	return m == MediaFileTypeJPEG || m == MediaFileTypeMP4
+}
+
+const (
+	MediaFileTypeJPEG MediaFileType = 0
+	MediaFileTypeMP4  MediaFileType = 3
+)
+
+type CameraAttr int
+
+func (c CameraAttr) IsValid() bool {
+	return c == CameraAttrInfrared || c == CameraAttrWide || c == CameraAttrZoom || c == CameraAttrVisible
+}
+
+const (
+	CameraAttrInfrared CameraAttr = iota
+	CameraAttrZoom
+	CameraAttrWide
+	CameraAttrVisible CameraAttr = iota + 2
+)
+
+type MediaFileDesc struct {
+	FileName         string
+	FilePath         string
+	FileSize         uint64
+	FileType         MediaFileType
+	CameraAttr       CameraAttr
+	Latitude         float64
+	Longitude        float64
+	AbsoluteAltitude float64
+	RelativeAltitude float64
+	GimbalYawDegree  float64
+	ImageWidth       int
+	ImageHeight      int
+	VideoDuration    time.Duration
+	CreateTime       time.Time
 }

@@ -1,3 +1,5 @@
+//go:build linux
+
 /*
  * Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
  *
@@ -27,7 +29,6 @@ void esdkCgoStreamStatusCallback(void* ctx,uint32_t value);
 import "C"
 import (
 	"errors"
-	"fmt"
 	"runtime"
 	"sync/atomic"
 	"unsafe"
@@ -58,67 +59,6 @@ func esdkCgoStreamStatusCallback(ctx unsafe.Pointer, value C.uint32_t) {
 	}
 	lv := (*LiveView)(ctx)
 	lv.onLiveStatusUpdate(status)
-}
-
-// The CameraSource type of stream source
-type CameraSource int
-
-func (c CameraSource) IsValid() bool {
-	return c >= CameraSourceWide && c <= CameraSourceIR
-}
-
-const (
-	CameraSourceWide CameraSource = iota + 1 //wide-angle lens camera
-	CameraSourceZoom                         //zoom lens camera
-	CameraSourceIR                           //infrared lens camera
-)
-
-// StreamQuality quality of the stream
-type StreamQuality int
-
-func (s StreamQuality) IsValid() bool {
-	return s >= StreamQuality540p && s <= StreamQuality1080p
-}
-
-const (
-	// StreamQuality540p 30fps, 960*540, bps 512*1024
-	StreamQuality540p StreamQuality = iota + 1
-
-	// StreamQuality720p 30fps, 1280*720, bps 1024*1024
-	StreamQuality720p
-
-	// StreamQuality720pHigh 30fps, 1280*720, bps 1024*1024 + 512*1024
-	StreamQuality720pHigh
-
-	// StreamQuality1080p 30fps, 1920*1080, bps 3*1024*1024
-	StreamQuality1080p
-)
-
-// CameraType type of stream camera
-type CameraType int
-
-func (c CameraType) IsValid() bool {
-	return c == CameraTypeFpv || c == CameraTypePayload
-}
-
-const (
-	CameraTypeFpv CameraType = iota
-	CameraTypePayload
-)
-
-// StreamReceiver is an interface for receiving stream data, status.
-type StreamReceiver interface {
-	// The OnStreamStatusUpdate is callback for LiveView stream-status.
-	//
-	//When the cloud is configured for live broadcast, the transmission channel is unbalanced, the aircraft is disconnected,
-	//the video transmission has no signal and other factors will cause the code stream status to change.
-	OnStreamStatusUpdate(status *LiveStatus)
-	// The OnReceiveStreamData is a callback that receives stream data.
-	//
-	//Note: The 'data' parameter is a reference pointing to the C memory block.
-	//you should use 'copy(dst,data)' or bytes.Buffer.Write() to copy it to the Go memory block,
-	//directly using it as go bytes will cause panic.
-	OnReceiveStreamData(data []byte)
 }
 
 type LiveView struct {
@@ -234,6 +174,10 @@ func (lv *LiveView) setupStreamStatusCallback() error {
 }
 
 // StartH264Stream start receive live H264 stream,stream data can be received through StreamReceiver.OnReceiveStreamData
+//
+// Note: When there are no available streams to subscribe to in the stream status
+// (for example, if the aircraft is not powered on or not properly tuned),
+// calling this interface will block and wait for availability, and return a failure after a timeout (5-10 seconds)
 func (lv *LiveView) StartH264Stream() error {
 	if !lv.cameraInitialized() {
 		return errors.New(" live-view is not initialized")
@@ -246,23 +190,4 @@ func (lv *LiveView) StartH264Stream() error {
 func (lv *LiveView) StopH264Stream() error {
 	ret := C.Edge_LiveView_stopH264Stream(lv.native)
 	return convertCCodeToError(int(ret))
-}
-
-type LiveStatus struct {
-	Value                 int
-	QualityAutoAvailable  bool
-	Quality540PAvailable  bool
-	Quality720PAvailable  bool
-	Quality720PHAvailable bool
-	Quality1080PAvailable bool
-}
-
-func (l *LiveStatus) String() string {
-	return fmt.Sprintf("value:%d auto:%v 540p:%v 720p:%v 720ph:%v 1080p:%v",
-		l.Value,
-		l.QualityAutoAvailable,
-		l.Quality540PAvailable,
-		l.Quality720PAvailable,
-		l.Quality720PHAvailable,
-		l.Quality1080PAvailable)
 }
