@@ -72,7 +72,7 @@ export CGO_LDFLAGS="-L{your Edge-SDK path}/lib/{x86_64 or aarch64} -ledgesdk -lc
 
 ### Stream Simulate
 
-It is very inconvenient to debug real Dji-Edge devices, and Edge-SDK only supports linux (arch:x86_64aarch64) operating
+It is very inconvenient to debug real Dji-Edge devices, and Edge-SDK only supports linux (arch:x86_64/aarch64) operating
 system.<br>
 the package provides a simple simulation implementation,
 supports SDK initialization and pushing real-time camera streams,

@@ -24,19 +24,76 @@ import (
 	"syscall"
 )
 
+type BytesData struct {
+}
+
+func (b *BytesData) Write(p []byte) (n int, err error) {
+	return 0, err
+}
+
+func (b *BytesData) Test(p []byte) (n int, err error) {
+	return 0, err
+}
+
+type streamHandler struct {
+}
+
+func (s *streamHandler) OnStreamStatusUpdate(status *edge.LiveStatus) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *streamHandler) OnReceiveStreamData(data []byte) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *streamHandler) AllocateStreamData() *BytesData {
+	//TODO implement me
+	panic("implement me")
+}
+
 func main() {
 
-	live := edge.NewLiveView()
+	s := &streamHandler{}
 
-	err := live.Init(5, 0, func(data any, size uint) {
-
-	})
+	lv := edge.NewLiveView[*BytesData]()
+	err := lv.Init(6, 6, s)
 
 	fmt.Println(err)
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM, syscall.SIGINT)
-	x := <-c
+	<-c
+}
 
-	fmt.Println("\nend", x)
+func initSDK() error {
+	app := &edge.AuthInfo{
+		Name:    "",
+		Id:      "",
+		AppKey:  "",
+		License: "",
+		Account: "",
+	}
+
+	dev := &edge.DeviceInfo{
+		ProductName:     "",
+		VendorName:      "",
+		SerialNumber:    "sn",
+		FirmwareVersion: edge.FirmwareVersion{MinorVersion: 1},
+	}
+
+	key := &edge.RSA2048Key{
+		PrivateKey: "",
+		PublicKey:  "",
+	}
+
+	logger := &edge.Logger{
+		Level:          edge.LogLevelDebug,
+		EnableColorful: true,
+		Outputer: func(msg string) {
+			fmt.Println(msg)
+		},
+	}
+	return edge.InitSDK(dev, app, key, logger, true)
 }
