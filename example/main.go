@@ -24,45 +24,27 @@ import (
 	"syscall"
 )
 
-type BytesData struct {
-}
-
-func (b *BytesData) Write(p []byte) (n int, err error) {
-	return 0, err
-}
-
-func (b *BytesData) Test(p []byte) (n int, err error) {
-	return 0, err
-}
-
-type streamHandler struct {
-}
+type streamHandler struct{}
 
 func (s *streamHandler) OnStreamStatusUpdate(status *edge.LiveStatus) {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (s *streamHandler) OnReceiveStreamData(data []byte) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *streamHandler) AllocateStreamData() *BytesData {
-	//TODO implement me
 	panic("implement me")
 }
 
 func main() {
+	if err := initSDK(); err != nil {
+		panic(err)
+	}
 
 	s := &streamHandler{}
+	lv := edge.NewLiveView()
+	if err := lv.Init(edge.CameraTypePayload, edge.StreamQuality720p, s); err != nil {
+		panic(err)
+	}
 
-	lv := edge.NewLiveView[*BytesData]()
-	err := lv.Init(6, 6, s)
-
-	fmt.Println(err)
-
-	c := make(chan os.Signal, 2)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM, syscall.SIGINT)
 	<-c
 }
