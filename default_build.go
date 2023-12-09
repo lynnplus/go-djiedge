@@ -1,4 +1,4 @@
-//go:build linux && !custom_edge_env
+//go:build linux && !custom_edge_env && !fake_edge
 
 /*
  * Copyright (c) 2023 Lynn <lynnplus90@gmail.com>

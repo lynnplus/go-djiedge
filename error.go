@@ -47,45 +47,34 @@ var (
 	ErrFileReaderNotOpen = errors.New("file reader is not opened")
 )
 
+var (
+	codeErrMap = map[int]error{
+		1:  ErrInvalidArgument,
+		2:  ErrSystemError,
+		3:  ErrInvalidOperation,
+		4:  ErrRepeatOperation,
+		5:  ErrNullPointer,
+		6:  ErrParamOutOfRange,
+		7:  ErrParamGetFailure,
+		8:  ErrParamSetFailure,
+		9:  ErrSendPackFailure,
+		10: ErrRequestTimeout,
+		11: ErrAuthVerifyFailure,
+		12: ErrEncryptFailure,
+		13: ErrDecryptFailure,
+		14: ErrInvalidRespond,
+		15: ErrRemoteFailure,
+		16: ErrNoVideoID,
+		17: ErrConnectFailure,
+	}
+)
+
 func convertCCodeToError(code int) error {
 	if code == 0 {
 		return nil
 	}
-	switch code {
-	case 1:
-		return ErrInvalidArgument
-	case 2:
-		return ErrSystemError
-	case 3:
-		return ErrInvalidOperation
-	case 4:
-		return ErrRepeatOperation
-	case 5:
-		return ErrNullPointer
-	case 6:
-		return ErrParamOutOfRange
-	case 7:
-		return ErrParamGetFailure
-	case 8:
-		return ErrParamSetFailure
-	case 9:
-		return ErrSendPackFailure
-	case 10:
-		return ErrRequestTimeout
-	case 11:
-		return ErrAuthVerifyFailure
-	case 12:
-		return ErrEncryptFailure
-	case 13:
-		return ErrDecryptFailure
-	case 14:
-		return ErrInvalidRespond
-	case 15:
-		return ErrRemoteFailure
-	case 16:
-		return ErrNoVideoID
-	case 17:
-		return ErrConnectFailure
+	if err := codeErrMap[code]; err != nil {
+		return err
 	}
 	return fmt.Errorf("djiedge: unknown error,code %v", code)
 }

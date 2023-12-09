@@ -19,7 +19,7 @@ https://developer.dji.com/doc/edge-sdk-tutorial/en/
 
 The package only run on Linux systems, it is recommended to use Ubuntu 22.04.1 LTS
 
-- stdc++ >=11 (recommend c++14)
+- stdc++ >=11 (recommend c++14 or higher)
 - openssl >=1.1.1f
 - libssh2 >=1.10.0 ,install by command `sudo apt-get install libssh2-1-dev`
 
@@ -44,7 +44,7 @@ you need to download the SDK manually.
 By default, the package only following cgo compilation instructions are provided,
 so you need to manually configure the cgo system environment variables
 
-default_build.go
+[default_build.go](default_build.go)  
 `#cgo LDFLAGS: -ledgesdk -lcrypto -lssh2`
 
 CGO compilation instructions can be temporarily configured in the console.
@@ -69,3 +69,28 @@ For example:
 export CGO_CXXFLAGS="-std=c++14 -I{your Edge-SDK path}/include"
 export CGO_LDFLAGS="-L{your Edge-SDK path}/lib/{x86_64 or aarch64} -ledgesdk -lcrypto -lssh2"
 ```
+
+### Stream Simulate
+
+It is very inconvenient to debug real Dji-Edge devices, and Edge-SDK only supports linux (arch:x86_64aarch64) operating
+system.<br>
+the package provides a simple simulation implementation,
+supports SDK initialization and pushing real-time camera streams,
+currently only supports read h264 file[edge_stream.h264]. <br>
+
+Construction constraints that currently enable the simulation function `//go:build !linux || fake_edge`
+
+The implementation file is in [edge_simulation.go](edge_simulation.go),can add `-tags fake_edge` to open it when
+building.
+
+Step Tips:
+
+1. Add `fake_edge` build constraints, build executable file<br>
+   `go build -tags fake_edge`
+2. Convert mp4 file to h264 format file<br>
+    ```shell
+    sudo apt-get install ffmpeg
+    ffmpeg -i test.mp4 -codec copy -bsf: h264_mp4toannexb -f h264 edge_stream.h264
+    ```
+3. Copy the generated edge_stream.h264 to the same level directory as the executable file
+4. Run

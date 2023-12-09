@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux && !fake_edge
 
 /*
  * Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+// Package djiedge provides Go language bindings for the dji-edge-sdk.
 package djiedge
 
 /*
@@ -58,6 +59,7 @@ func convertToCVersion(version *FirmwareVersion) C.CEdgeVersion {
 
 var initState atomic.Int32 //0:none  1: initializing  2:initialized
 
+// Initialized returns whether the sdk instance has been initialized
 func Initialized() bool {
 	return initState.Load() == 2
 }
