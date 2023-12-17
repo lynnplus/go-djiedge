@@ -1,4 +1,4 @@
-//go:build linux
+//go:build linux && !fake_edge
 
 // Copyright (c) 2023 Lynn <lynnplus90@gmail.com>
 //
