@@ -21,6 +21,7 @@ package djiedge
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -72,6 +73,7 @@ func (lv *LiveView) StartH264Stream() error {
 
 	f, err := os.Open(fakeEdgeStreamFileName)
 	if err != nil {
+		lv.reading.Store(false)
 		return err
 	}
 	lv.streamReader = f
@@ -96,7 +98,7 @@ func (lv *LiveView) StopH264Stream() error {
 		return nil
 	}
 	if !lv.reading.CompareAndSwap(true, false) {
-		return nil
+		return errors.New("state error")
 	}
 	lv.closeSig <- true
 	lv.wg.Wait()

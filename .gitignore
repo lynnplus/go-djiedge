@@ -9,6 +9,7 @@
 .idea/.name
 .idea/codeStyles
 .idea/remote-targets.xml
+.idea/GOHCache.xml
 *.iml
 clion/
 example/bin
