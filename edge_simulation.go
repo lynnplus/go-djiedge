@@ -196,7 +196,9 @@ func loopReadH264File(reader io.Reader, frameInterval int, receiver chan []byte,
 				fmt.Println("fake stream block!!!")
 				continue
 			}
-			receiver <- b
+			cc := make([]byte, len(b))
+			copy(cc, b)
+			receiver <- cc
 		case <-closeSig:
 			return
 		}
